@@ -1,8 +1,7 @@
 (function($) {
 	
 	"use strict";
-	
-	
+
 	//Hide Loading Box (Preloader)
 	function handlePreloader() {
 		if($('.preloader').length){
