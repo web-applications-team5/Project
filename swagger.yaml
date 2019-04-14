@@ -1,0 +1,282 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: "Food Order"
+  description: "Restaurant food order API"
+  contact:
+    name: "Dev"
+  license:
+    name: "MIT"
+host: "localhost:5000"
+basePath: "/api/v1"
+schemes:
+    - "http"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+paths:
+  /restaurants:
+    get:
+      tags:
+      - "restaurant"
+      summary: "Retrieve restaurants"
+      description: "Return all the restaurants"
+      operationId: "retrieveRestaurants"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "Success"
+          schema:
+            $ref: "#/definitions/ListOfRestaurants"
+        "500":
+          description: "Server Error"
+          schema:
+            $ref: "#/definitions/ServiceException"
+  /restaurants/{restaurantId}:
+    get:
+      tags:
+      - "restaurant"
+      summary: "Retrieve restaurant"
+      description: "Return a restaurants"
+      operationId: "retrieveSingleRestaurant"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "restaurantId"
+        in: "path"
+        description: "ID of restaurant to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "Success"
+          schema:
+            $ref: "#/definitions/RestaurantInfo"
+        "404":
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/ServiceException"
+        "500":
+          description: "Server Error"
+          schema:
+            $ref: "#/definitions/ServiceException"
+  /restaurants/{restaurantId}/photos:
+    get:
+      tags:
+        - "Restaurant"
+      summary: "Retrieve restaurant photos"
+      description: "Return restaurants photos"
+      operationId: "retrieveRestaurantPhotos"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "restaurantId"
+        in: "path"
+        description: "ID of restaurant to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "Success"
+          schema:
+            $ref: "#/definitions/RestaurantPhotoResponse"
+        "404":
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/ServiceException"
+        "500":
+          description: "Server Error"
+          schema:
+            $ref: "#/definitions/ServiceException"
+  /restaurants/{restaurantId}/menu:
+    get:
+      tags:
+        - "menu"
+      summary: "Retrieve restaurant menu"
+      description: "Return restaurants menu which includes list of all the items that can be ordered"
+      operationId: "retrieveRestaurantMenu"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "restaurantId"
+        in: "path"
+        description: "ID of restaurant to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "page"
+        in: "query"
+        type: "string"
+      responses:
+        "200":
+          description: "Success"
+          schema:
+            $ref: "#/definitions/RestaurantMenu"
+        "404":
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/ServiceException"
+        "500":
+          description: "Server Error"
+          schema:
+            $ref: "#/definitions/ServiceException"
+  /restaurants/{restaurantId}/orders:
+    post:
+      tags:
+        - "order"
+      summary: "Submit restaurant order"
+      description: "Places order on a list of menu items from a restaurant"
+      operationId: "submitOrder"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "restaurantId"
+        in: "path"
+        description: "ID of restaurant to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "body"
+        description: "Menu items to be ordered for the user, along with user information."
+        required: true
+        schema:
+          $ref: "#/definitions/OrderRequest"
+      responses:
+        "200":
+          description: "Success"
+          schema:
+            $ref: "#/definitions/OrderInfo"
+        "400":
+          description: "Bad Request"
+          schema:
+            $ref: "#/definitions/ServiceException"
+        "404":
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/ServiceException"
+        "500":
+          description: "Server Error"
+          schema:
+            $ref: "#/definitions/ServiceException"
+definitions:
+  ListOfRestaurants:
+    type: object
+    properties:
+      restaurants:
+        type: "array"
+        items:
+          $ref: "#/definitions/RestaurantInfo"
+  RestaurantPhotoResponse:
+    type: object
+    properties:
+      photos:
+        type: "array"
+        items:
+          type: "string"
+  RestaurantInfo:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+      openTime:
+        type: "string"
+        format: "date-time"
+      closeTime:
+        type: "string"
+        format: "date-time"
+      logo:
+        type: "string"
+      description:
+        type: "string"
+      rating:
+        type: "integer"
+        format: "int32"
+      address:
+        $ref: "#/definitions/Address"
+  RestaurantMenu:
+    type: "object"
+    properties:
+      restaurantId:
+        type: integer
+      restaurants:
+        type: "array"
+        items:
+          $ref: "#/definitions/MenuItems"
+  MenuItems:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+      price:
+        type: "number"
+      description:
+        type: "string"
+      photo:
+        type: "string"
+      status:
+        type: "string"
+        enum:
+          - ACTIVE
+          - INACTIVE
+  Address:
+    type: "object"
+    properties:
+      addressLine:
+        type: "string"
+      city:
+        type: "string"
+      state:
+        type: "string"
+      zipcode:
+        type: "string"
+  OrderInfo:
+    type: "object"
+    properties:
+      confirmation_number:
+        type: "string"
+      finish_time:
+        type: "string"
+        format: "date-time"
+      order_time:
+        type: "string"
+        format: "date-time"
+      restaurant_info:
+        $ref: "#/definitions/RestaurantInfo"
+  ServiceException:
+    type: "object"
+    properties:
+      code:
+        type: "string"
+      message:
+        type: "string"
+      details:
+        type: "string"
+  OrderRequest:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      phone:
+        type: "string"
+      email:
+        type: "string"
+      restaurantId:
+        type: "integer"
+      menuItems:
+        type: "array"
+        item:
+          type: "object"
+          properties:
+            id:
+              type: integer
+            quantity:
+              type: integer
