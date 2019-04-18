@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\static",
+    "\\templates"
   ],
-  "SelectedNode": "\\README.md",
+  "SelectedNode": "\\templates\\ordernow.html",
   "PreviewInSolutionExplorer": false
 }
